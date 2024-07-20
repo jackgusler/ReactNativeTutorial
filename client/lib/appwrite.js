@@ -1,4 +1,11 @@
-import { Account, Avatars, Client, Databases, ID, Query } from "react-native-appwrite";
+import {
+  Account,
+  Avatars,
+  Client,
+  Databases,
+  ID,
+  Query,
+} from "react-native-appwrite";
 
 export const config = {
   endpoint: "https://cloud.appwrite.io/v1",
@@ -10,13 +17,23 @@ export const config = {
   storageId: "669a8e490005f09553a9",
 };
 
+const {
+  endpoint,
+  platform,
+  projectId,
+  databaseId,
+  userCollectionId,
+  videoCollectionId,
+  storageId,
+} = config;
+
 // Init your React Native SDK
 const client = new Client();
 
 client
-  .setEndpoint(config.endpoint)
-  .setProject(config.projectId)
-  .setPlatform(config.platform);
+  .setEndpoint(endpoint)
+  .setProject(projectId)
+  .setPlatform(platform);
 
 const account = new Account(client);
 const avatars = new Avatars(client);
@@ -40,8 +57,8 @@ export const createUser = async (email, password, username) => {
     await signIn(email, password);
 
     const newUser = await databases.createDocument(
-      config.databaseId,
-      config.userCollectionId,
+      databaseId,
+      userCollectionId,
       ID.unique(),
       {
         accountId: newAccount.$id,
@@ -73,20 +90,38 @@ export const getCurrentUser = async () => {
     const currentUser = await account.get();
 
     if (!currentUser) {
-      throw Error
+      throw Error;
     }
 
     const user = await databases.listDocuments(
-      config.databaseId,
-      config.userCollectionId,
-      [Query.equal('accountId', currentUser.$id)]
+      databaseId,
+      userCollectionId,
+      [Query.equal("accountId", currentUser.$id)]
     );
 
     if (!user) {
-      throw Error
+      throw Error;
     }
 
     return user.documents[0];
+  } catch (error) {
+    console.error(error);
+    throw new Error(error);
+  }
+};
+
+export const getAllPosts = async () => {
+  try {
+    const posts = await databases.listDocuments(
+      databaseId,
+      videoCollectionId
+    );
+
+    if (!posts) {
+      throw Error;
+    }
+
+    return posts.documents;
   } catch (error) {
     console.error(error);
     throw new Error(error);
