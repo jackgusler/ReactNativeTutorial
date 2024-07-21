@@ -153,3 +153,30 @@ export const searchPosts = async (query) => {
     throw new Error(error);
   }
 };
+
+export const getUserPosts = async (userId) => {
+  try {
+    const posts = await databases.listDocuments(databaseId, videoCollectionId, [
+      Query.equal("creator", userId),
+    ]);
+
+    if (!posts) {
+      throw Error;
+    }
+
+    return posts.documents;
+  } catch (error) {
+    console.error(error);
+    throw new Error(error);
+  }
+};
+
+export const signOut = async () => {
+  try {
+    const session = await account.deleteSession("current");
+    return session;
+  } catch (error) {
+    console.error(error);
+    throw new Error(error);
+  }
+};
