@@ -30,10 +30,7 @@ const {
 // Init your React Native SDK
 const client = new Client();
 
-client
-  .setEndpoint(endpoint)
-  .setProject(projectId)
-  .setPlatform(platform);
+client.setEndpoint(endpoint).setProject(projectId).setPlatform(platform);
 
 const account = new Account(client);
 const avatars = new Avatars(client);
@@ -93,11 +90,9 @@ export const getCurrentUser = async () => {
       throw Error;
     }
 
-    const user = await databases.listDocuments(
-      databaseId,
-      userCollectionId,
-      [Query.equal("accountId", currentUser.$id)]
-    );
+    const user = await databases.listDocuments(databaseId, userCollectionId, [
+      Query.equal("accountId", currentUser.$id),
+    ]);
 
     if (!user) {
       throw Error;
@@ -112,10 +107,7 @@ export const getCurrentUser = async () => {
 
 export const getAllPosts = async () => {
   try {
-    const posts = await databases.listDocuments(
-      databaseId,
-      videoCollectionId
-    );
+    const posts = await databases.listDocuments(databaseId, videoCollectionId);
 
     if (!posts) {
       throw Error;
@@ -130,11 +122,9 @@ export const getAllPosts = async () => {
 
 export const getLatestPosts = async () => {
   try {
-    const posts = await databases.listDocuments(
-      databaseId,
-      videoCollectionId,
-      [Query.orderDesc("$createdAt", Query.limit(7))]
-    );
+    const posts = await databases.listDocuments(databaseId, videoCollectionId, [
+      Query.orderDesc("$createdAt", Query.limit(7)),
+    ]);
 
     if (!posts) {
       throw Error;
@@ -145,4 +135,21 @@ export const getLatestPosts = async () => {
     console.error(error);
     throw new Error(error);
   }
-}
+};
+
+export const searchPosts = async (query) => {
+  try {
+    const posts = await databases.listDocuments(databaseId, videoCollectionId, [
+      Query.search("title", query),
+    ]);
+
+    if (!posts) {
+      throw Error;
+    }
+
+    return posts.documents;
+  } catch (error) {
+    console.error(error);
+    throw new Error(error);
+  }
+};
